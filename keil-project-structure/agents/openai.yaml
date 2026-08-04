@@ -1,0 +1,4 @@
+interface:
+  display_name: "Keil Project Structure"
+  short_description: "Organize Keil project files and directories"
+  default_prompt: "Use $keil-project-structure to design or review a consistent Keil project layout and file naming scheme."
