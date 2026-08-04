@@ -19,28 +19,42 @@ This skill provides precise instructions on how to compile (Build) and flash (Do
 
 Never assume a fixed Keil installation path. Use a user-level environment variable so the path survives terminal sessions and computer migrations.
 
-Ask the user in the conversation for the Keil installation directory when `KEIL_UV4_PATH` is missing or invalid. Do not use `Read-Host` in an automated run. Then set `$searchRoot` to the directory supplied by the user and run:
+When `KEIL_UV4_PATH` is missing or invalid, first check the Windows Compatibility Assistant registry record. If that also fails, ask the user in the conversation for the Keil installation directory. Do not use `Read-Host` in an automated run. Then set `$searchRoot` to the directory supplied by the user and run:
 
 ```powershell
 $uv4Path = [Environment]::GetEnvironmentVariable('KEIL_UV4_PATH', 'User')
 
 if (-not $uv4Path -or -not (Test-Path -LiteralPath $uv4Path)) {
-    if (-not (Test-Path -LiteralPath $searchRoot -PathType Container)) {
-        throw "Keil installation directory not found: $searchRoot"
+    $registryPath = 'HKCU:\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store'
+    $registryCandidates = @()
+    if (Test-Path -LiteralPath $registryPath) {
+        $registryCandidates = @((Get-Item -LiteralPath $registryPath).Property |
+            Where-Object { $_ -match '(?i)\\UV4\.exe$' } |
+            Where-Object { Test-Path -LiteralPath $_ -PathType Leaf })
     }
 
-    $uv4Candidates = @(Get-ChildItem -LiteralPath $searchRoot -Filter 'UV4.exe' -File -Recurse -ErrorAction SilentlyContinue |
-        Select-Object -ExpandProperty FullName)
+    if ($registryCandidates.Count -eq 1) {
+        $uv4Path = $registryCandidates[0]
+    } elseif ($registryCandidates.Count -gt 1) {
+        throw "Multiple UV4.exe registry records found. Ask the user to select one: $($registryCandidates -join '; ')"
+    } else {
+        if (-not (Test-Path -LiteralPath $searchRoot -PathType Container)) {
+            throw "Keil installation directory not found: $searchRoot"
+        }
 
-    if ($uv4Candidates.Count -eq 0) {
-        throw "UV4.exe not found under: $searchRoot"
+        $uv4Candidates = @(Get-ChildItem -LiteralPath $searchRoot -Filter 'UV4.exe' -File -Recurse -ErrorAction SilentlyContinue |
+            Select-Object -ExpandProperty FullName)
+
+        if ($uv4Candidates.Count -eq 0) {
+            throw "UV4.exe not found under: $searchRoot"
+        }
+
+        if ($uv4Candidates.Count -gt 1) {
+            throw "Multiple UV4.exe files found. Ask the user to select one: $($uv4Candidates -join '; ')"
+        }
+
+        $uv4Path = $uv4Candidates[0]
     }
-
-    if ($uv4Candidates.Count -gt 1) {
-        throw "Multiple UV4.exe files found. Ask the user to select one: $($uv4Candidates -join '; ')"
-    }
-
-    $uv4Path = $uv4Candidates[0]
 
     [Environment]::SetEnvironmentVariable('KEIL_UV4_PATH', $uv4Path, 'User')
     $env:KEIL_UV4_PATH = $uv4Path
