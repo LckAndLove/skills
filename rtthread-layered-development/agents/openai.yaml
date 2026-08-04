@@ -1,0 +1,4 @@
+interface:
+  display_name: "RT-Thread Layered Development"
+  short_description: "Define RT-Thread layer responsibilities and boundaries"
+  default_prompt: "Use $rtthread-layered-development to design or review layered RT-Thread code."
