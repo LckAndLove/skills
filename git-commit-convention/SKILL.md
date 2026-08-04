@@ -1,6 +1,6 @@
 ---
 name: git-commit-convention
-description: 使用 Conventional Commits 规范创建、审查和优化 Git 提交信息。适用于准备提交、选择提交类型或作用域、描述暂存区变更、记录破坏性变更，以及检查提交历史一致性的场景。
+description: Create, review, and improve Git commit messages using the Conventional Commits format. Use when preparing commits, choosing a commit type or scope, describing staged changes, documenting breaking changes, or checking commit history for consistency. For Chinese-language repositories, keep commit subjects, bodies, and migration notes in Simplified Chinese while retaining conventional types and scopes in English.
 ---
 
 # Git Commit Convention
