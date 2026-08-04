@@ -1,0 +1,4 @@
+interface:
+  display_name: "Embedded C Coding Standard"
+  short_description: "Embedded C rules for safe, portable code"
+  default_prompt: "Use $embedded-c-coding-standard to review or write embedded C code against a practical safety and portability standard."
