@@ -38,3 +38,11 @@ skill-name/
    ```
 
 4. 检查差异后提交，需要时再推送到远程仓库。
+
+## 其他资源
+
+- [变更记录](./CHANGELOG.md)
+- [许可证](./LICENSE)
+- [当前版本](./.github/VERSION)
+
+仓库会通过 GitHub Actions 自动验证技能目录、`SKILL.md` 元数据和 `agents/openai.yaml`。
