@@ -10,9 +10,10 @@ This skill provides precise instructions on how to compile (Build) and flash (Do
 ## Prerequisite Configurations
 
 1. **Project File Path**: Find the `.uvprojx` file inside the workspace (usually under `MDK-ARM` folder).
-2. **Log Files**:
-   - Build log: `build_keil.log`
-   - Flash log: `burn.log`
+2. **Log Directory**: Use the Windows temporary directory, not the project directory:
+   - Directory: `%TEMP%\keil-build-flash\`
+   - Build log: `%TEMP%\keil-build-flash\build_keil.log`
+   - Flash log: `%TEMP%\keil-build-flash\burn.log`
 
 ## 0. Configure Keil UV4 Path
 
@@ -46,6 +47,9 @@ if (-not $uv4Path -or -not (Test-Path -LiteralPath $uv4Path)) {
 }
 
 Write-Host "Using Keil: $uv4Path"
+
+$logDirectory = Join-Path ([System.IO.Path]::GetTempPath()) 'keil-build-flash'
+New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 ```
 
 The user only needs to provide an installation directory once. On later runs, read `KEIL_UV4_PATH` and verify that the resolved file still exists. If Keil is moved or upgraded, ask for the new directory and update the variable.
@@ -60,7 +64,7 @@ To compile the Keil project, run the build command **synchronously** in PowerShe
 
 ```powershell
 $projectPath = '<Absolute-Path-To-uvprojx>'
-$buildLogPath = '<Absolute-Path-To-build_keil.log>'
+$buildLogPath = Join-Path $logDirectory 'build_keil.log'
 $buildProcess = Start-Process -FilePath $uv4Path `
     -ArgumentList @('-b', "`"$projectPath`"", '-o', "`"$buildLogPath`"") `
     -Wait -PassThru
@@ -85,7 +89,7 @@ To download the compiled firmware onto the hardware target, run the flash comman
 
 ```powershell
 $projectPath = '<Absolute-Path-To-uvprojx>'
-$flashLogPath = '<Absolute-Path-To-burn.log>'
+$flashLogPath = Join-Path $logDirectory 'burn.log'
 $flashProcess = Start-Process -FilePath $uv4Path `
     -ArgumentList @('-f', "`"$projectPath`"", '-o', "`"$flashLogPath`"") `
     -Wait -PassThru
