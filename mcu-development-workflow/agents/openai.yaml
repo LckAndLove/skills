@@ -1,0 +1,4 @@
+interface:
+  display_name: "MCU Development Workflow"
+  short_description: "Guide the complete embedded MCU development process"
+  default_prompt: "Use $mcu-development-workflow to plan or review an embedded MCU development workflow."
